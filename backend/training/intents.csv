@@ -1,0 +1,289 @@
+question,intent
+What is the minimum attendance requirement?,attendance
+How much attendance is required?,attendance
+What happens if my attendance is low?,attendance
+How is attendance calculated?,attendance
+Can I appear for exams with low attendance?,attendance
+What is the attendance rule for labs?,attendance
+How do I check my attendance?,attendance
+Is attendance mandatory for all subjects?,attendance
+What attendance percentage is needed?,attendance
+Do medical leaves affect attendance?,attendance
+How can I improve my attendance?,attendance
+Is there attendance for practical sessions?,attendance
+What is detention due to attendance?,attendance
+How often is attendance updated?,attendance
+Can attendance be corrected later?,attendance
+Who should I contact for attendance issues?,attendance
+Are online classes counted in attendance?,attendance
+What documents are needed for attendance exemption?,attendance
+Is attendance taken every lecture?,attendance
+What is the short attendance policy?,attendance
+How many classes can I miss?,attendance
+Does attendance differ for theory and practical?,attendance
+When is attendance finalized each semester?,attendance
+Can parents get attendance reports?,attendance
+When are semester exams?,examination
+Where can I find the exam timetable?,examination
+How do I get my hall ticket?,examination
+What items are allowed in the exam hall?,examination
+When will exam results be published?,examination
+How can I apply for revaluation?,examination
+What is the exam malpractice policy?,examination
+Are makeup exams available?,examination
+How are internal marks calculated for exams?,examination
+Where is my exam center?,examination
+What is the passing mark in exams?,examination
+Can I change my exam subject choice?,examination
+How do I report an exam schedule conflict?,examination
+When does the exam cell release notices?,examination
+What should I do if I miss an exam?,examination
+How are practical exams conducted?,examination
+Is there an exam fee?,examination
+How do I download previous question papers?,examination
+What is the exam seating arrangement process?,examination
+Who do I contact for hall ticket problems?,examination
+Are calculators allowed in exams?,examination
+What time should I reach the exam hall?,examination
+How can I see my exam form status?,examination
+When are supplementary exams held?,examination
+When does the library open?,library
+How many books can I borrow?,library
+What are the library timings?,library
+How do I get a library membership?,library
+What is the book return deadline?,library
+Are there fines for late returns?,library
+Does the library have digital resources?,library
+How can I search for books online?,library
+Is there a reading room in the library?,library
+Can I renew borrowed books?,library
+How do I reserve a book?,library
+What is the library holiday schedule?,library
+Where is the library help desk?,library
+Are reference books available for issue?,library
+How do I report a lost library book?,library
+Does the library provide previous year papers?,library
+Can I access e journals from library?,library
+What ID is required in the library?,library
+Are group study rooms available?,library
+How do I check my borrowed books list?,library
+What is the maximum loan period?,library
+Is library membership free for students?,library
+Can I suggest new books to the library?,library
+Where can I find library rules?,library
+How do I pay my college fees?,fees
+What is the fee payment deadline?,fees
+Can fees be paid online?,fees
+Where can I get a fee receipt?,fees
+What is the tuition fee structure?,fees
+Are there installment options for fees?,fees
+How do I apply for fee concession?,fees
+What happens if I pay fees late?,fees
+Is there a development fee?,fees
+How can I check my fee status?,fees
+What payment modes are accepted?,fees
+Can I get a refund of fees?,fees
+Where is the accounts office?,fees
+Do I need to pay exam fees separately?,fees
+What documents are needed for fee payment?,fees
+Is hostel fee included in college fee?,fees
+How do I download fee challan?,fees
+Are there penalties for delayed payment?,fees
+Who should I contact for fee issues?,fees
+Can parents pay fees on my behalf?,fees
+What is the process for fee waiver?,fees
+Is GST included in college fees?,fees
+How often are fee notices published?,fees
+Can I pay fees through bank transfer?,fees
+What scholarships are available?,scholarship
+How can I apply for a scholarship?,scholarship
+What is the eligibility for scholarships?,scholarship
+When is the scholarship application deadline?,scholarship
+Which documents are needed for scholarship?,scholarship
+Are government scholarships available?,scholarship
+How do I check scholarship status?,scholarship
+Is there a merit scholarship?,scholarship
+Can first year students apply for scholarships?,scholarship
+What is the scholarship selection process?,scholarship
+Are scholarships available for reserved categories?,scholarship
+How are scholarship amounts disbursed?,scholarship
+Who is the scholarship coordinator?,scholarship
+Can I apply for more than one scholarship?,scholarship
+What GPA is required for scholarship?,scholarship
+Are sports scholarships offered?,scholarship
+Do scholarships cover hostel fees?,scholarship
+How do I renew my scholarship?,scholarship
+Where can I find scholarship notices?,scholarship
+What is the income limit for scholarships?,scholarship
+Are there scholarships for girls?,scholarship
+Can scholarship forms be submitted online?,scholarship
+What happens if scholarship application is rejected?,scholarship
+Is attendance required for scholarship?,scholarship
+Who is the HOD of CSE?,faculty
+How can I contact my class teacher?,faculty
+Where is the faculty room?,faculty
+Who teaches data structures this semester?,faculty
+How do I meet a professor during office hours?,faculty
+Where can I find faculty email addresses?,faculty
+Who is the mentor for my batch?,faculty
+Which faculty handles project guidance?,faculty
+How do I request a faculty recommendation letter?,faculty
+Who is the dean of academics?,faculty
+Where is the CSE HOD cabin?,faculty
+Can I schedule a meeting with faculty?,faculty
+Who supervises laboratory sessions?,faculty
+How do I report a faculty related concern?,faculty
+Where is the faculty directory published?,faculty
+Who coordinates industrial training?,faculty
+Which professor is the exam coordinator?,faculty
+How can I contact the placement officer?,faculty
+Who handles student grievances?,faculty
+Where do faculty post lecture updates?,faculty
+Who is in charge of the department?,faculty
+How do I find faculty room numbers?,faculty
+Who approves internship letters?,faculty
+Where can I see faculty qualifications?,faculty
+Where is the CSE department?,department
+Which block has mechanical department?,department
+How do I reach the electronics department office?,department
+Where is the IT department located?,department
+What are the department office timings?,department
+How can I contact the department office?,department
+Where is the civil department?,department
+Which floor is the MBA department on?,department
+Where do I submit department forms?,department
+How do I get a department bonafide letter?,department
+Where is the department notice board?,department
+Which departments offer elective subjects?,department
+Where is the department laboratory?,department
+How do I change my department preference?,department
+Where can I find department syllabus?,department
+Which department handles training and placement?,department
+Where is the department library?,department
+How do I visit the department head office?,department
+Where are department events announced?,department
+Which block has the science departments?,department
+Where is the department seminar hall?,department
+How do I get department approval for projects?,department
+Where is the computer lab in CSE?,department
+Which department office handles transfers?,department
+Where can I see my class timetable?,timetable
+When does the first lecture start?,timetable
+How do I download the timetable?,timetable
+What is today's lecture schedule?,timetable
+Are timetable changes posted online?,timetable
+Where is the exam timetable displayed?,timetable
+How often is the timetable updated?,timetable
+Which room is my next class in?,timetable
+Where can I find the lab timetable?,timetable
+What is the weekly class schedule?,timetable
+How do I know about timetable revisions?,timetable
+Where is the master timetable published?,timetable
+What time does college start?,timetable
+When are free periods in the timetable?,timetable
+How can parents view the timetable?,timetable
+Where is the faculty timetable?,timetable
+Does the timetable include breaks?,timetable
+How do I report a timetable clash?,timetable
+Where can I find the tutorial schedule?,timetable
+What is the Saturday timetable?,timetable
+Are online classes shown in timetable?,timetable
+Where is the department wise timetable?,timetable
+How do I get a printed timetable?,timetable
+When is the new semester timetable released?,timetable
+How do I apply for hostel accommodation?,hostel
+What are the hostel fees?,hostel
+What items are allowed in hostel rooms?,hostel
+What are hostel timing rules?,hostel
+How do I report a hostel maintenance issue?,hostel
+Is hostel mess compulsory?,hostel
+What is the hostel admission process?,hostel
+Can day scholars visit the hostel?,hostel
+Where is the hostel office?,hostel
+How are hostel rooms allocated?,hostel
+What is the hostel curfew time?,hostel
+Are visitors allowed in hostel?,hostel
+How do I request a hostel room change?,hostel
+What are hostel discipline rules?,hostel
+Is Wi-Fi available in hostel?,hostel
+How do I pay hostel fees?,hostel
+Where can I find hostel notices?,hostel
+What documents are needed for hostel admission?,hostel
+Are separate hostels available for girls and boys?,hostel
+How do I apply for hostel leave?,hostel
+What is the hostel refund policy?,hostel
+Who is the hostel warden?,hostel
+Can I choose my roommate?,hostel
+Where is the hostel complaint box?,hostel
+How do I apply for admission?,admission
+What is the admission eligibility criteria?,admission
+When does the admission process start?,admission
+Which documents are required for admission?,admission
+How can I check admission status?,admission
+What is the admission fee?,admission
+Is there an entrance exam for admission?,admission
+How do I submit the admission form?,admission
+What is the last date for admission?,admission
+Can I get admission through management quota?,admission
+Where is the admission office?,admission
+How do I confirm my admission seat?,admission
+What is the counseling schedule?,admission
+Are NRI admissions available?,admission
+How do I transfer admission from another college?,admission
+What certificates are needed on admission day?,admission
+Can admission forms be filled online?,admission
+How do I contact the admission helpdesk?,admission
+What is the age limit for admission?,admission
+Is migration certificate required for admission?,admission
+How do I cancel admission?,admission
+Where can I download the admission brochure?,admission
+What courses are open for admission?,admission
+How is merit list prepared for admission?,admission
+What are the credit requirements for graduation?,academic
+How do I register for subjects?,academic
+What is the minimum CGPA required?,academic
+How can I apply for a transcript?,academic
+What is the academic calendar?,academic
+How do I choose electives?,academic
+What are the rules for backlog subjects?,academic
+How is CGPA calculated?,academic
+Where can I find academic regulations?,academic
+How do I apply for course withdrawal?,academic
+What is the promotion policy?,academic
+How many credits per semester are required?,academic
+Where is the academic section office?,academic
+How do I get a bonafide certificate?,academic
+What is the honor code policy?,academic
+How do I apply for minor degree?,academic
+What is the maximum duration to complete degree?,academic
+How are internal assessments conducted?,academic
+Where can I see my academic progress?,academic
+How do I request syllabus copy?,academic
+What is the grading system?,academic
+How do I apply for year back approval?,academic
+Where are academic notices posted?,academic
+How can I change my registered subjects?,academic
+Hello,general
+Hi there,general
+Good morning,general
+Thank you,general
+Who are you?,general
+What can you help me with?,general
+How does this chatbot work?,general
+Can you assist me?,general
+I need help,general
+Tell me about yourself,general
+What services do you provide?,general
+Help me navigate the portal,general
+Who is the current president of the United States?,general
+What is the weather today?,general
+Tell me a joke,general
+What is artificial intelligence?,general
+How do I use this app?,general
+Is my data secure here?,general
+Can you summarize my question?,general
+What languages do you support?,general
+Good evening,general
+Please guide me,general
+Where can I find college contact numbers?,general
+What are your working hours?,general
