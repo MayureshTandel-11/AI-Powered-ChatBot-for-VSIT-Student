@@ -1,5 +1,6 @@
 """Reusable text chunking with paragraph-aware splitting."""
 
+import re
 from dataclasses import dataclass
 
 from app.core.config import get_settings
@@ -15,6 +16,20 @@ class TextChunk:
     page_number: int | None
     source: str
     word_count: int
+    section: str | None = None
+
+
+def _detect_section_heading(text: str) -> str | None:
+    for line in text.split("\n"):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.isupper() and 4 <= len(stripped) <= 80:
+            return stripped.title()
+        if re.match(r"^\d+\.\s+[A-Z]", stripped):
+            return stripped
+        break
+    return None
 
 
 def chunk_pages(
@@ -32,6 +47,7 @@ def chunk_pages(
 
     chunks: list[TextChunk] = []
     chunk_index = 0
+    current_section: str | None = None
 
     for page_text, page_number in pages:
         cleaned_page = clean_text(page_text)
@@ -42,6 +58,10 @@ def chunk_pages(
         buffer = ""
 
         for paragraph in paragraphs:
+            heading = _detect_section_heading(paragraph)
+            if heading:
+                current_section = heading
+
             candidate = f"{buffer}\n\n{paragraph}".strip() if buffer else paragraph
             if count_words(candidate) <= size:
                 buffer = candidate
@@ -56,6 +76,7 @@ def chunk_pages(
                         chunk_size=size,
                         chunk_overlap=overlap,
                         start_index=chunk_index,
+                        section=current_section,
                     )
                 )
                 chunk_index = chunks[-1].chunk_id + 1 if chunks else 0
@@ -69,6 +90,7 @@ def chunk_pages(
                         chunk_size=size,
                         chunk_overlap=overlap,
                         start_index=chunk_index,
+                        section=current_section,
                     )
                 )
                 chunk_index = chunks[-1].chunk_id + 1 if chunks else 0
@@ -83,6 +105,7 @@ def chunk_pages(
                     chunk_size=size,
                     chunk_overlap=overlap,
                     start_index=chunk_index,
+                    section=current_section,
                 )
             )
             chunk_index = chunks[-1].chunk_id + 1 if chunks else 0
@@ -98,6 +121,7 @@ def _split_text_block(
     chunk_size: int,
     chunk_overlap: int,
     start_index: int,
+    section: str | None = None,
 ) -> list[TextChunk]:
     words = text.split()
     if not words:
@@ -112,6 +136,7 @@ def _split_text_block(
                 page_number=page_number,
                 source=source,
                 word_count=count_words(content),
+                section=section,
             )
         ]
 
@@ -131,6 +156,7 @@ def _split_text_block(
                 page_number=page_number,
                 source=source,
                 word_count=count_words(content),
+                section=section,
             )
         )
         index += 1

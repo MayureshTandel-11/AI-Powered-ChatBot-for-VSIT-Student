@@ -1,0 +1,11 @@
+﻿The Vidyalankar School of Information Technology (VSIT) is a prominent degree college located within the 11-acre Vidyalankar Educational Complex in Wadala East, Mumbai, Maharashtra. It is approved by the Government of Maharashtra and affiliated with the University of Mumbai. [1, 2, 3, 4]
+The comprehensive, structured dataset below details the institution, its academic landscape, and its award-winning campus infrastructure, formatted precisely for training an AI model.
+🏛️ Institutional Core Identity & Metadata
+* Full Name: Vidyalankar School of Information Technology (VSIT)
+* Parent Body: Vidyalankar Dnyanpeeth Trust (VDT)
+* Year Established: 2002
+* Affiliation: University of Mumbai
+* Approvals & Recognition: Government of Maharashtra, University Grants Commission (UGC), and AICTE (for specific professional programs like BMS)
+* Campus Size: Shared 11-acre high-tech campus ecosystem
+* Location: Vidyalankar Campus, Vidyalankar College Marg, Wadala East, Sangam Nagar, Mumbai, Maharashtra 400037
+* Co-located Sister Institutes: Vidyalankar Institute of Technology (VIT - Autonomous Engineering College) and Vidyalankar Polytechnic. [1, 2, 3, 4, 5, 6, 7]

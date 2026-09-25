@@ -11,10 +11,10 @@ SAMPLES_DIR = Path(__file__).resolve().parents[1] / "data" / "documents" / "samp
 
 
 def _seed_attendance_document(db: Session) -> Document:
-    text = (SAMPLES_DIR / "attendance_policy.txt").read_text(encoding="utf-8")
+    text = (SAMPLES_DIR / "attendance_management.txt").read_text(encoding="utf-8")
     document = Document(
-        filename="attendance_policy.txt",
-        file_path=str(SAMPLES_DIR / "attendance_policy.txt"),
+        filename="attendance_management.txt",
+        file_path=str(SAMPLES_DIR / "attendance_management.txt"),
         document_type="txt",
         status="processed",
         chunk_count=1,

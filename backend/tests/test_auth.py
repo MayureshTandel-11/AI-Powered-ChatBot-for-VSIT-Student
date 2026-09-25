@@ -14,9 +14,12 @@ def test_register_student(client: TestClient) -> None:
             "confirm_password": "password123",
         },
     )
-    assert response.status_code == 202
+    assert response.status_code == 201
     data = response.json()
-    assert "verification" in data["message"].lower()
+    assert data["token_type"] == "bearer"
+    assert data["access_token"]
+    assert data["user"]["email"] == "alice.student@vsit.edu.in"
+    assert data["user"]["role"] == "student"
 
 
 def test_register_duplicate_email(client: TestClient) -> None:
@@ -27,12 +30,10 @@ def test_register_duplicate_email(client: TestClient) -> None:
         "password": "password123",
         "confirm_password": "password123",
     }
-    # first register
     client.post("/api/auth/register", json=payload)
-    # simulate verifying the account by creating a verified user
     response = client.post("/api/auth/register", json=payload)
-    # second call will update existing pending; behavior returns 202 or 400 depending on verification
-    assert response.status_code in (202, 400)
+    assert response.status_code == 400
+    assert "already registered" in response.json()["detail"].lower()
 
 
 def test_login_success(client: TestClient, student_user) -> None:

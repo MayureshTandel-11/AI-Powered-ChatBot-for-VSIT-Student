@@ -123,9 +123,9 @@ AI-Chatbot/
 
 ```bash
 cd backend
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate          # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 cp .env.example .env
 ```
 
@@ -157,7 +157,7 @@ PYTHONPATH=. python scripts/seed_knowledge_base.py
 ### 5. Start backend
 
 ```bash
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+    uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 Verify: http://127.0.0.1:8000/health → `{"status":"ok"}`
@@ -174,32 +174,13 @@ npm run dev
 
 Open: http://localhost:5173
 
-## Student Registration (VSIT email + OTP)
+## Student Registration
 
-Students must register with their institutional email in the exact format `name.surname@vsit.edu.in`.
+Students register with their VSIT email in the format `name.surname@vsit.edu.in`.
 
-Flow:
-
-- Student fills first name, surname, VSIT email, password, confirm password
-- Backend validates email and creates a pending student account (role forced to `student`)
-- Backend generates a secure 6-digit OTP and sends it via the internal email service
-- Student verifies the OTP on `/verify-email`
-- After verification the account is marked verified and the student can login
-
-Environment variables (backend `.env`):
-
-```
-OTP_EXPIRY_MINUTES=10
-OTP_MAX_ATTEMPTS=5
-OTP_RESEND_COOLDOWN_SECONDS=60
-EMAIL_SERVICE_URL=http://localhost:3001
-EMAIL_SERVICE_TIMEOUT=10
-EMAIL_DEV_MODE=true
-```
-
-When `EMAIL_DEV_MODE=true`, OTP codes are printed in the backend console instead of being sent by email. Use this for local development without running the email service.
-
-Email service `.env.example` is under `email-service/.env.example`.
+- Fill in first name, surname, email, password, and confirm password
+- The backend validates the email format and creates the account
+- A JWT token is returned immediately — you can start chatting right away
 
 ---
 

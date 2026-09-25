@@ -1,0 +1,6 @@
+﻿Academic Ecosystem & Elective Paths
+VSIT offers multi-disciplinary programs spanning Information Technology, Computer Science, Commerce, Management, and Mass Media. [1, 2, 3]
+* The Department of Computing: Manages 1,000+ concurrently enrolled students across B.Sc. IT and M.Sc. IT pipelines.
+* Advanced Elective Specializations: Tracks include Artificial Intelligence (AI), Machine Learning (ML), Data Science, Cyber Security, and Next-Gen IoT.
+* Credit Transfer Framework: Allows high-performing students to take credit-earning curriculum tracks at elite partner institutions like IIT Bombay, IIM Mumbai, CDAC, and L&T Skill Training Academy without extra tuition fees.
+* M.Sc. Data Science & AI: Blended educational delivery structure focusing heavily on theoretical computer science, live industrial capstones, and platform-integrated MOOC programs. [1, 2, 3, 4]

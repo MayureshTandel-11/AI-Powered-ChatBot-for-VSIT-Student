@@ -27,16 +27,14 @@ export default function LoginForm({ onSuccess }) {
         throw new Error("Passwords do not match");
       }
 
-      await register({
+      const data = await register({
         first_name: firstName.trim(),
         surname: surname.trim(),
         email: email.trim().toLowerCase(),
         password,
         confirm_password: confirmPassword,
       });
-
-      localStorage.setItem("pending_email", email.trim().toLowerCase());
-      window.location.href = "/verify-email";
+      onSuccess(data.user);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -71,8 +69,8 @@ export default function LoginForm({ onSuccess }) {
 
       <p className="auth-card-desc">
         {mode === "login"
-          ? "Use your verified VSIT email to access the chatbot."
-          : "Register with your official VSIT student email."}
+          ? "Sign in with your VSIT email to access the chatbot."
+          : "Create your account with your official VSIT student email."}
       </p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
@@ -144,10 +142,6 @@ export default function LoginForm({ onSuccess }) {
           {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
         </button>
       </form>
-
-      {mode === "register" && (
-        <p className="auth-note">A verification OTP will be sent to your VSIT email.</p>
-      )}
     </div>
   );
 }

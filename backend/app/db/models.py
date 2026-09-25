@@ -23,9 +23,6 @@ class User(Base):
         server_default=func.now(),
         nullable=False,
     )
-    # Email verification status
-    email_verified: Mapped[bool] = mapped_column(Integer, default=0, nullable=False)
-    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class Document(Base):
@@ -122,25 +119,3 @@ class ChatMessage(Base):
     )
 
     session: Mapped["ChatSession"] = relationship(back_populates="messages")
-
-
-class EmailVerificationOTP(Base):
-    """Stores OTPs for email verification (hashed)."""
-
-    __tablename__ = "email_verification_otps"
-
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=True)
-    email: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
-    otp_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    verified: Mapped[bool] = mapped_column(Integer, default=0, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        nullable=False,
-    )
-    last_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-
-    user = relationship("User")

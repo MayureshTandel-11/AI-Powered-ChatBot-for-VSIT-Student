@@ -9,13 +9,40 @@ from app.core.config import get_settings
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-SYSTEM_PROMPT = """You are an AI student assistant for a college.
+SYSTEM_PROMPT = """You are the AI Student Assistant for the college.
 
-Answer the student's question using only the provided college knowledge context.
-Do not invent college policies, dates, faculty names, fees, rules, or other facts.
-If the answer cannot be determined from the provided context, clearly say that the information is not available in the college knowledge base.
-When appropriate, recommend that the student contact the relevant college department.
-Keep answers concise, clear, and student-friendly."""
+Your job is to help students understand college-related information using the provided knowledge context.
+
+Students may ask questions in many different ways. Interpret their intent and wording naturally.
+
+The question may be:
+- direct
+- conversational
+- vague
+- broad
+- paraphrased
+- informal
+- a follow-up question
+
+Use the retrieved college context to answer.
+
+For broad questions, summarize the most relevant information instead of requiring an exact matching sentence.
+
+For follow-up questions, use recent conversation context when provided.
+
+Do not invent college-specific facts.
+
+If the provided context does not contain enough information, say that the information is not available in the college knowledge base.
+
+Do not pretend to know official college information that was not provided.
+
+Keep responses concise and student-friendly."""
+
+
+NO_CONTEXT_ANSWER = (
+    "I couldn't find this information in the college knowledge base. "
+    "Please contact the relevant college department for the latest information."
+)
 
 
 class LLMServiceError(Exception):
@@ -25,20 +52,60 @@ class LLMServiceError(Exception):
         self.status_code = status_code
 
 
+def build_rag_user_prompt(
+    question: str,
+    context: str,
+    *,
+    conversation_context: str = "",
+    is_broad: bool = False,
+) -> str:
+    sections = [f"College knowledge context:\n{context}"]
+
+    if conversation_context.strip():
+        sections.append(f"Recent conversation:\n{conversation_context.strip()}")
+
+    sections.append(f"Student question:\n{question.strip()}")
+
+    instruction = "Provide a grounded answer using only the college knowledge context above."
+    if is_broad:
+        instruction += " Summarize the most relevant aspects as a concise overview."
+    if conversation_context.strip():
+        instruction += " Treat follow-up questions in light of the recent conversation."
+
+    sections.append(instruction)
+    return "\n\n".join(sections)
+
+
 def generate_completion(system_prompt: str, user_prompt: str) -> str:
     """Generate a completion using the configured LLM provider."""
     if not settings.llm_api_key:
-        raise LLMServiceError("LLM API key is not configured. Set LLM_API_KEY in your environment.")
+        raise LLMServiceError(
+            "LLM service is not configured. Set LLM_API_KEY in your backend .env file.",
+            status_code=503,
+        )
 
     provider = settings.llm_provider.lower()
-    if provider == "openai":
+    if provider in {"openai", "groq"}:
         return _generate_openai_compatible(system_prompt, user_prompt)
-    raise LLMServiceError(f"Unsupported LLM provider: {settings.llm_provider}")
+
+    if settings.llm_api_key.startswith("gsk_"):
+        raise LLMServiceError(
+            "LLM API key appears to be a Groq key. Set LLM_PROVIDER=groq and "
+            "LLM_BASE_URL=https://api.groq.com/openai/v1 in backend/.env.",
+            status_code=503,
+        )
+
+    raise LLMServiceError(
+        f"Unsupported LLM provider: {settings.llm_provider}. Supported providers: openai, groq.",
+        status_code=503,
+    )
 
 
 def _generate_openai_compatible(system_prompt: str, user_prompt: str) -> str:
-    base_url = settings.llm_base_url.rstrip("/") if settings.llm_base_url else "https://api.openai.com/v1"
-    url = f"{base_url}/chat/completions"
+    try:
+        url = settings.llm_chat_completions_url
+    except ValueError as exc:
+        raise LLMServiceError(str(exc), status_code=503) from exc
     headers = {
         "Authorization": f"Bearer {settings.llm_api_key}",
         "Content-Type": "application/json",
@@ -59,7 +126,23 @@ def _generate_openai_compatible(system_prompt: str, user_prompt: str) -> str:
             data = response.json()
             return data["choices"][0]["message"]["content"].strip()
     except httpx.HTTPStatusError as exc:
-        logger.error("LLM API HTTP error: %s", exc.response.text)
+        status_code = exc.response.status_code
+        logger.error(
+            "LLM API HTTP error | provider=%s model=%s status=%s",
+            settings.llm_provider,
+            settings.llm_model,
+            status_code,
+        )
+        if status_code in {401, 403}:
+            raise LLMServiceError(
+                "LLM API authentication failed. Verify LLM_API_KEY, LLM_PROVIDER, and LLM_BASE_URL.",
+                status_code=503,
+            ) from exc
+        if status_code == 404:
+            raise LLMServiceError(
+                f"LLM model '{settings.llm_model}' was not found for provider '{settings.llm_provider}'.",
+                status_code=503,
+            ) from exc
         raise LLMServiceError("LLM API request failed", status_code=502) from exc
     except httpx.RequestError as exc:
         logger.error("LLM API connection error: %s", exc)

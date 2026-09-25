@@ -1,0 +1,8 @@
+﻿Infrastructure & Specialized Laboratories
+* Network & Connectivity: Campus-wide Wi-Fi managed from a central data center protected by an enterprise-grade hardware firewall. Over 30 strategic high-speed access points cover the academic structures.
+* Computing Center Labs: Over 8 modern computer laboratories housing 250+ terminal machines configured to industrial software standards.
+* Next-Gen IOT Lab: A dedicated workspace equipped for internet-of-things architecture, microcontrollers, embedded systems, and sensor arrays.
+* Creative Lotus Labs: High-concept laboratory spaces structured to foster collaborative UI/UX research and experimental software coding.
+* Apple Mac Labs: Dedicated macOS server-client labs tailored for iOS development, app deployment, and high-performance computing tasks.
+* Digital Central Library: Spans a massive footprint housing 6,450+ physical books, 2,125 specialized technical/management reference titles, dictionaries, international research journals, and full access to global e-resources.
+* Central Printing Ecosystem: Introduces a unified, web-based centralized printing mechanism where students upload print files from any device and release jobs at designated terminal stations.

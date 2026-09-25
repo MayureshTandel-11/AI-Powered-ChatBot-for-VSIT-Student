@@ -36,10 +36,10 @@ def trained_intent_model(tmp_path, monkeypatch):
 
 
 def _seed_attendance_document(db_session) -> None:
-    text = (SAMPLES_DIR / "attendance_policy.txt").read_text(encoding="utf-8")
+    text = (SAMPLES_DIR / "attendance_management.txt").read_text(encoding="utf-8")
     document = Document(
-        filename="attendance_policy.txt",
-        file_path=str(SAMPLES_DIR / "attendance_policy.txt"),
+        filename="attendance_management.txt",
+        file_path=str(SAMPLES_DIR / "attendance_management.txt"),
         document_type="txt",
         status="processed",
         chunk_count=1,
@@ -116,7 +116,7 @@ def test_rag_chat_returns_sources_with_mock_llm(
     data = response.json()
     assert data["intent"] == "attendance"
     assert data["sources"]
-    assert data["sources"][0]["document"] == "attendance_policy.txt"
+    assert data["sources"][0]["document"] == "attendance_management.txt"
     assert "attendance" in data["answer"].lower()
 
 
@@ -192,7 +192,6 @@ def test_student_cannot_access_other_users_session(
         email="other.student@vsit.edu.in",
         password_hash=hash_password("otherpass1"),
         role="student",
-        email_verified=True,
     )
     db_session.add(other)
     db_session.commit()

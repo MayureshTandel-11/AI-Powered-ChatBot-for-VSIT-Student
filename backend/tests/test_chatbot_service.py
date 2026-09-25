@@ -1,24 +1,26 @@
 """Unit tests for chatbot helper logic."""
 
-from app.services.chatbot_service import (
-    OFF_TOPIC_ANSWER,
-    _build_sources,
-    _is_greeting,
-    _is_off_topic,
-)
+from app.services.chatbot_service import _build_sources
+from app.services.query_service import OFF_TOPIC_RESPONSE, match_conversational
 from app.services.retrieval_service import RetrievedChunk
 
 
-def test_is_off_topic_detects_non_college_question() -> None:
-    assert _is_off_topic("Who is the current president of the United States?")
+def test_match_conversational_detects_off_topic() -> None:
+    match = match_conversational("Who is the current president of the United States?")
+    assert match is not None
+    assert match.kind == "off_topic"
 
 
-def test_is_off_topic_detects_geography_question() -> None:
-    assert _is_off_topic("What is the capital of France?")
+def test_match_conversational_detects_geography_question() -> None:
+    match = match_conversational("What is the capital of France?")
+    assert match is not None
+    assert match.kind == "off_topic"
 
 
-def test_is_greeting_detects_hello() -> None:
-    assert _is_greeting("Hello")
+def test_match_conversational_detects_greeting() -> None:
+    match = match_conversational("Hello")
+    assert match is not None
+    assert match.kind == "greeting"
 
 
 def test_build_sources_deduplicates_documents() -> None:
@@ -28,27 +30,27 @@ def test_build_sources_deduplicates_documents() -> None:
             document_id=1,
             chunk_id=0,
             content="Attendance policy text",
-            source="attendance_policy.txt",
+            source="attendance_management.txt",
             page_number=1,
             score=0.9,
-            filename="attendance_policy.txt",
+            filename="attendance_management.txt",
         ),
         RetrievedChunk(
             chunk_db_id=2,
             document_id=1,
             chunk_id=1,
             content="More attendance text",
-            source="attendance_policy.txt",
+            source="attendance_management.txt",
             page_number=1,
             score=0.8,
-            filename="attendance_policy.txt",
+            filename="attendance_management.txt",
         ),
     ]
     sources = _build_sources(chunks)
     assert len(sources) == 1
-    assert sources[0].document == "attendance_policy.txt"
+    assert sources[0].document == "attendance_management.txt"
     assert sources[0].page == 1
 
 
-def test_off_topic_answer_is_safe() -> None:
-    assert "college" in OFF_TOPIC_ANSWER.lower()
+def test_off_topic_response_is_safe() -> None:
+    assert "college" in OFF_TOPIC_RESPONSE.lower()

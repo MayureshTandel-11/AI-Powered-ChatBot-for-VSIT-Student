@@ -14,7 +14,6 @@ from app.api.documents import router as documents_router
 from app.core.config import get_settings
 from app.db.database import init_db
 from app.services.intent_service import get_intent_metrics, reset_intent_classifier
-from app.services.retrieval_service import get_vector_store
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,8 +28,7 @@ async def lifespan(app: FastAPI):
     """Initialize resources on startup and clean up on shutdown."""
     logger.info("Starting %s", settings.app_name)
     init_db()
-    vector_store = get_vector_store()
-    logger.info("Vector store ready with %s indexed chunks", vector_store.index.ntotal)
+    logger.info("Heavy ML resources (embeddings, FAISS) load lazily on first chat request")
 
     metrics = get_intent_metrics()
     if metrics:

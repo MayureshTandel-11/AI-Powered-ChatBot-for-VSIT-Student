@@ -4,7 +4,7 @@ import logging
 from io import BytesIO
 
 from fastapi import UploadFile
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session  # type: ignore
 
 from app.core.config import BACKEND_ROOT
 from app.db.database import SessionLocal, init_db
@@ -20,10 +20,14 @@ logger = logging.getLogger(__name__)
 
 SAMPLES_DIR = BACKEND_ROOT / "data" / "documents" / "samples"
 SAMPLE_FILES = [
-    "attendance_policy.txt",
-    "library_info.txt",
-    "examination_info.txt",
+    "attendance_management.txt",
+    "academics_management.txt",
+    "library_management.txt",
+    "readingroom.txt",
+    "playground_facilities.txt",
     "department_directory.csv",
+    "canteen_facilities.txt",
+    "examination_evaluation.txt",
 ]
 
 

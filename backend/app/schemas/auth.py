@@ -36,12 +36,3 @@ class TokenResponse(BaseModel):
 
 class MessageResponse(BaseModel):
     message: str
-
-
-class OTPVerifyRequest(BaseModel):
-    email: EmailStr
-    otp: str = Field(min_length=6, max_length=6)
-
-
-class ResendOtpRequest(BaseModel):
-    email: EmailStr

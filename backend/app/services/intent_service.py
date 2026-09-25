@@ -39,6 +39,20 @@ def classify_intent(question: str) -> IntentPrediction:
     return classifier.predict(question)
 
 
+def predict_intent_with_confidence(question: str) -> dict[str, str | float]:
+    """Return intent prediction with confidence; low confidence yields unknown hint."""
+    prediction = classify_intent(question)
+    effective_intent = prediction.intent
+    if prediction.confidence < settings.intent_confidence_threshold:
+        effective_intent = "unknown"
+
+    return {
+        "intent": effective_intent,
+        "raw_intent": prediction.intent,
+        "confidence": prediction.confidence,
+    }
+
+
 def get_intent_metrics() -> dict | None:
     metrics_path = Path(settings.intent_metrics_path)
     return load_metrics(metrics_path)

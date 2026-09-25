@@ -23,7 +23,6 @@ def create_admin(name: str, email: str, password: str) -> None:
             existing.role = "admin"
             existing.password_hash = hash_password(password)
             existing.name = name
-            existing.email_verified = True
             db.commit()
             print(f"Updated existing user to admin: {email}")
             return
@@ -33,7 +32,6 @@ def create_admin(name: str, email: str, password: str) -> None:
             email=email,
             password_hash=hash_password(password),
             role="admin",
-            email_verified=True,
         )
         db.add(admin)
         db.commit()

@@ -10,7 +10,7 @@ from app.services.llm_service import LLMServiceError, generate_completion
 
 def test_generate_completion_requires_api_key(monkeypatch) -> None:
     monkeypatch.setattr("app.services.llm_service.settings.llm_api_key", "")
-    with pytest.raises(LLMServiceError, match="API key"):
+    with pytest.raises(LLMServiceError, match="LLM service is not configured"):
         generate_completion("system", "user")
 
 
@@ -34,6 +34,29 @@ def test_generate_completion_openai_success(mock_client_cls, monkeypatch) -> Non
 
     answer = generate_completion("system prompt", "user prompt")
     assert answer == "Grounded college answer."
+
+
+@patch("app.services.llm_service.httpx.Client")
+def test_generate_completion_groq_success(mock_client_cls, monkeypatch) -> None:
+    monkeypatch.setattr("app.services.llm_service.settings.llm_api_key", "test-key")
+    monkeypatch.setattr("app.services.llm_service.settings.llm_provider", "groq")
+    monkeypatch.setattr("app.services.llm_service.settings.llm_model", "llama-3.1-8b-instant")
+    monkeypatch.setattr("app.services.llm_service.settings.llm_base_url", "")
+
+    mock_response = MagicMock()
+    mock_response.raise_for_status.return_value = None
+    mock_response.json.return_value = {
+        "choices": [{"message": {"content": "Groq grounded answer."}}]
+    }
+
+    mock_client = MagicMock()
+    mock_client.__enter__.return_value = mock_client
+    mock_client.post.return_value = mock_response
+    mock_client_cls.return_value = mock_client
+
+    answer = generate_completion("system prompt", "user prompt")
+    assert answer == "Groq grounded answer."
+    assert mock_client.post.call_args.args[0] == "https://api.groq.com/openai/v1/chat/completions"
 
 
 @patch("app.services.llm_service.httpx.Client")

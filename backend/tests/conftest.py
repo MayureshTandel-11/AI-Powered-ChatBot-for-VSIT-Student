@@ -28,7 +28,6 @@ def test_env(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, "use_fake_embeddings", True)
     monkeypatch.setattr(settings, "vector_store_directory", str(vector_dir))
     monkeypatch.setattr(settings, "similarity_threshold", 0.05)
-    monkeypatch.setattr(settings, "email_dev_mode", True)
     monkeypatch.setattr("app.services.retrieval_service.settings.use_fake_embeddings", True)
     monkeypatch.setattr("app.services.retrieval_service.settings.vector_store_directory", str(vector_dir))
     monkeypatch.setattr("app.services.retrieval_service.settings.similarity_threshold", 0.05)
@@ -81,7 +80,6 @@ def student_user(db_session) -> User:
         password_hash=hash_password("studentpass"),
         role="student",
     )
-    user.email_verified = True
     db_session.add(user)
     db_session.commit()
     db_session.refresh(user)
@@ -96,7 +94,6 @@ def admin_user(db_session) -> User:
         password_hash=hash_password("adminpass1"),
         role="admin",
     )
-    user.email_verified = True
     db_session.add(user)
     db_session.commit()
     db_session.refresh(user)

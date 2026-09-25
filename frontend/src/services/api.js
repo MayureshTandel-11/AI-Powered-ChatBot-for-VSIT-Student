@@ -51,25 +51,9 @@ export async function register(payload) {
     headers: getHeaders(false),
     body: JSON.stringify(payload),
   });
-  return handleResponse(response);
-}
-
-export async function verifyEmailOtp(email, otp) {
-  const response = await fetch(`${API_BASE}/api/auth/verify-email-otp`, {
-    method: "POST",
-    headers: getHeaders(false),
-    body: JSON.stringify({ email, otp }),
-  });
-  return handleResponse(response);
-}
-
-export async function resendOtp(email) {
-  const response = await fetch(`${API_BASE}/api/auth/resend-otp`, {
-    method: "POST",
-    headers: getHeaders(false),
-    body: JSON.stringify({ email }),
-  });
-  return handleResponse(response);
+  const data = await handleResponse(response);
+  saveAuth(data);
+  return data;
 }
 
 export async function login(email, password) {

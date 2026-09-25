@@ -35,21 +35,21 @@ def test_student_cannot_upload_document(client, student_user) -> None:
         json={"email": "test.student@vsit.edu.in", "password": "studentpass"},
     )
     token = login.json()["access_token"]
-    sample = SAMPLES_DIR / "attendance_policy.txt"
+    sample = SAMPLES_DIR / "attendance_management.txt"
     response = client.post(
         "/api/admin/documents/upload",
         headers={"Authorization": f"Bearer {token}"},
-        files={"file": ("attendance_policy.txt", sample.read_bytes(), "text/plain")},
+        files={"file": ("attendance_management.txt", sample.read_bytes(), "text/plain")},
     )
     assert response.status_code == 403
 
 
 def test_admin_upload_txt_document(client, admin_headers) -> None:
-    sample = SAMPLES_DIR / "attendance_policy.txt"
+    sample = SAMPLES_DIR / "attendance_management.txt"
     response = client.post(
         "/api/admin/documents/upload",
         headers=admin_headers,
-        files={"file": ("attendance_policy.txt", sample.read_bytes(), "text/plain")},
+        files={"file": ("attendance_management.txt", sample.read_bytes(), "text/plain")},
     )
     assert response.status_code == 201
     data = response.json()
@@ -58,11 +58,11 @@ def test_admin_upload_txt_document(client, admin_headers) -> None:
 
 
 def test_admin_list_and_get_document(client, admin_headers) -> None:
-    sample = SAMPLES_DIR / "library_info.txt"
+    sample = SAMPLES_DIR / "library_management.txt"
     upload = client.post(
         "/api/admin/documents/upload",
         headers=admin_headers,
-        files={"file": ("library_info.txt", sample.read_bytes(), "text/plain")},
+        files={"file": ("library_management.txt", sample.read_bytes(), "text/plain")},
     )
     document_id = upload.json()["document"]["id"]
 
@@ -77,11 +77,11 @@ def test_admin_list_and_get_document(client, admin_headers) -> None:
 
 
 def test_admin_delete_document(client, admin_headers) -> None:
-    sample = SAMPLES_DIR / "examination_info.txt"
+    sample = SAMPLES_DIR / "examination_evaluation.txt"
     upload = client.post(
         "/api/admin/documents/upload",
         headers=admin_headers,
-        files={"file": ("examination_info.txt", sample.read_bytes(), "text/plain")},
+        files={"file": ("examination_evaluation.txt", sample.read_bytes(), "text/plain")},
     )
     document_id = upload.json()["document"]["id"]
 
@@ -102,14 +102,14 @@ def test_upload_unsupported_format(client, admin_headers) -> None:
 
 
 def test_attendance_question_content_is_chunked(client, admin_headers) -> None:
-    sample = SAMPLES_DIR / "attendance_policy.txt"
+    sample = SAMPLES_DIR / "attendance_management.txt"
     upload = client.post(
         "/api/admin/documents/upload",
         headers=admin_headers,
-        files={"file": ("attendance_policy.txt", sample.read_bytes(), "text/plain")},
+        files={"file": ("attendance_management.txt", sample.read_bytes(), "text/plain")},
     )
     document_id = upload.json()["document"]["id"]
     detail = client.get(f"/api/admin/documents/{document_id}", headers=admin_headers)
     combined = " ".join(chunk["content"] for chunk in detail.json()["chunks"]).lower()
     assert "attendance" in combined
-    assert "examination" in combined or "semester" in combined
+    assert "teachus" in combined or "percentage" in combined

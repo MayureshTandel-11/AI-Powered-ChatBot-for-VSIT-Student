@@ -53,3 +53,19 @@ def test_saved_model_can_be_reloaded(trained_model_paths) -> None:
     result = classifier.predict("When are semester exams?")
     assert result.intent == "examination"
     assert metrics is not None
+
+
+def test_intent_confidence_threshold(tmp_path, monkeypatch) -> None:
+    from app.services.intent_service import predict_intent_with_confidence, reset_intent_classifier
+
+    model_path = tmp_path / "intent_classifier.joblib"
+    metrics_path = tmp_path / "intent_metrics.json"
+    train_and_save(model_path=model_path, metrics_path=metrics_path)
+    monkeypatch.setattr("app.services.intent_service.settings.intent_model_path", str(model_path))
+    monkeypatch.setattr("app.services.intent_service.settings.intent_confidence_threshold", 0.99)
+
+    reset_intent_classifier()
+    result = predict_intent_with_confidence("What is the minimum attendance requirement?")
+    assert result["raw_intent"] == "attendance"
+    assert result["intent"] == "unknown"
+    reset_intent_classifier()

@@ -45,32 +45,4 @@ def init_db() -> None:
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
     Base.metadata.create_all(bind=engine)
-    _migrate_sqlite_schema()
     logger.info("Database initialized at %s", settings.database_url)
-
-
-def _migrate_sqlite_schema() -> None:
-    """Apply lightweight SQLite schema updates for existing databases."""
-    if not settings.database_url.startswith("sqlite"):
-        return
-
-    from sqlalchemy import inspect, text
-
-    inspector = inspect(engine)
-    if "users" not in inspector.get_table_names():
-        return
-
-    user_columns = {column["name"] for column in inspector.get_columns("users")}
-    statements: list[str] = []
-    if "email_verified" not in user_columns:
-        statements.append("ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 1")
-    if "email_verified_at" not in user_columns:
-        statements.append("ALTER TABLE users ADD COLUMN email_verified_at DATETIME")
-
-    if not statements:
-        return
-
-    with engine.begin() as connection:
-        for statement in statements:
-            connection.execute(text(statement))
-    logger.info("Applied SQLite schema updates: %s", ", ".join(statements))

@@ -12,7 +12,7 @@ SAMPLES_DIR = Path(__file__).resolve().parents[1] / "data" / "documents" / "samp
 
 
 def test_extract_txt_sample() -> None:
-    extracted = extract_text_from_file(SAMPLES_DIR / "attendance_policy.txt")
+    extracted = extract_text_from_file(SAMPLES_DIR / "attendance_management.txt")
     assert extracted.document_type == "txt"
     assert "attendance" in extracted.pages[0].text.lower()
 

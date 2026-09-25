@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Login from "./pages/Login.jsx";
-import VerifyEmail from "./pages/VerifyEmail.jsx";
 import Chat from "./pages/Chat.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import { getMe, getStoredUser, logout as clearAuth } from "./services/api.js";
@@ -34,14 +33,6 @@ function App() {
   }
 
   if (!user) {
-    if (window.location.pathname === "/verify-email") {
-      return (
-        <div className="app auth-layout">
-          <VerifyEmail />
-        </div>
-      );
-    }
-
     return (
       <div className="app auth-layout">
         <Login onSuccess={setUser} />

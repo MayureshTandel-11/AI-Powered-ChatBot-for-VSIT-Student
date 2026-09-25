@@ -1,50 +1,31 @@
-"""RAG chatbot pipeline orchestrating intent, retrieval, and LLM generation."""
+"""RAG chatbot pipeline orchestrating query processing, retrieval, and LLM generation."""
 
 import json
 import logging
-import re
 from dataclasses import dataclass
 
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.db.models import ChatMessage, ChatSession, User
 from app.schemas.chat import SourceCitation
-from app.services.intent_service import IntentServiceError, classify_intent
-from app.services.llm_service import SYSTEM_PROMPT, LLMServiceError, generate_completion
+from app.services.intent_service import IntentServiceError, predict_intent_with_confidence
+from app.services.llm_service import (
+    LLMServiceError,
+    NO_CONTEXT_ANSWER,
+    SYSTEM_PROMPT,
+    build_rag_user_prompt,
+    generate_completion,
+)
+from app.services.query_service import (
+    log_rag_debug,
+    match_conversational,
+    process_query,
+)
 from app.services.retrieval_service import RetrievedChunk, get_vector_store
 
 logger = logging.getLogger(__name__)
-
-OFF_TOPIC_PATTERNS = [
-    r"\bpresident of the united states\b",
-    r"\bweather\b",
-    r"\btell me a joke\b",
-    r"\bwho won the world cup\b",
-    r"\bprime minister of\b",
-    r"\bcapital of\b",
-]
-
-GREETING_PATTERNS = [
-    r"^(hi|hello|hey|good morning|good evening|good afternoon)\b",
-    r"\bthank you\b",
-    r"\bthanks\b",
-]
-
-NO_CONTEXT_ANSWER = (
-    "I couldn't find this information in the college knowledge base. "
-    "Please contact the relevant college department for the latest information."
-)
-
-OFF_TOPIC_ANSWER = (
-    "I'm a college student assistant and can help with college-related questions such as "
-    "attendance, exams, library, fees, departments, and academic rules. "
-    "Please ask me something about your college."
-)
-
-GENERAL_HELP_ANSWER = (
-    "I'm your college AI assistant. Ask me about attendance, examinations, library services, "
-    "fees, scholarships, departments, faculty, timetables, hostel, admission, or academic rules."
-)
+settings = get_settings()
 
 
 class ChatbotServiceError(Exception):
@@ -63,16 +44,6 @@ class ChatbotResult:
     message_id: int
 
 
-def _is_off_topic(question: str) -> bool:
-    normalized = question.lower()
-    return any(re.search(pattern, normalized) for pattern in OFF_TOPIC_PATTERNS)
-
-
-def _is_greeting(question: str) -> bool:
-    normalized = question.lower().strip()
-    return any(re.search(pattern, normalized) for pattern in GREETING_PATTERNS)
-
-
 def _build_sources(chunks: list[RetrievedChunk]) -> list[SourceCitation]:
     seen: set[tuple[str, int | None]] = set()
     sources: list[SourceCitation] = []
@@ -89,8 +60,11 @@ def _build_context(chunks: list[RetrievedChunk]) -> str:
     sections: list[str] = []
     for chunk in chunks:
         page_label = f"Page {chunk.page_number}" if chunk.page_number else "Page N/A"
+        section_label = f" | Section: {chunk.section}" if chunk.section else ""
+        category_label = f" | Category: {chunk.category}" if chunk.category else ""
         sections.append(
-            f"[Source: {chunk.filename} | {page_label}]\n{chunk.content.strip()}"
+            f"[Source: {chunk.filename} | {page_label}{section_label}{category_label}]\n"
+            f"{chunk.content.strip()}"
         )
     return "\n\n".join(sections)
 
@@ -127,6 +101,18 @@ def _get_or_create_session(db: Session, user: User, session_id: int | None, ques
     return session
 
 
+def _get_recent_history(db: Session, session: ChatSession) -> list[tuple[str, str]]:
+    messages = (
+        db.query(ChatMessage)
+        .filter(ChatMessage.session_id == session.id)
+        .order_by(ChatMessage.created_at.desc())
+        .limit(settings.chat_history_window * 2)
+        .all()
+    )
+    chronological = list(reversed(messages))
+    return [(message.role, message.message) for message in chronological]
+
+
 def _save_message(
     db: Session,
     *,
@@ -159,94 +145,14 @@ def create_chat_session(db: Session, user: User, title: str = "New Chat") -> Cha
     return session
 
 
-def process_chat_message(db: Session, user: User, question: str, session_id: int | None = None) -> ChatbotResult:
-    cleaned_question = question.strip()
-    if not cleaned_question:
-        raise ChatbotServiceError("Question cannot be empty")
-
-    session = _get_or_create_session(db, user, session_id, cleaned_question)
-    _save_message(db, user=user, session=session, role="user", message=cleaned_question)
-
-    if _is_off_topic(cleaned_question):
-        assistant_message = _save_message(
-            db,
-            user=user,
-            session=session,
-            role="assistant",
-            message=OFF_TOPIC_ANSWER,
-            intent="general",
-        )
-        return ChatbotResult(
-            answer=OFF_TOPIC_ANSWER,
-            intent="general",
-            sources=[],
-            session_id=session.id,
-            message_id=assistant_message.id,
-        )
-
-    try:
-        intent_prediction = classify_intent(cleaned_question)
-    except IntentServiceError as exc:
-        raise ChatbotServiceError(str(exc), status_code=503) from exc
-
-    intent = intent_prediction.intent
-    logger.info("Chat request classified as intent=%s user=%s", intent, user.email)
-
-    if intent == "general":
-        if _is_off_topic(cleaned_question):
-            answer = OFF_TOPIC_ANSWER
-        elif _is_greeting(cleaned_question):
-            answer = "Hello! I'm your college AI assistant. How can I help you with college-related information today?"
-        else:
-            answer = GENERAL_HELP_ANSWER
-
-        assistant_message = _save_message(
-            db,
-            user=user,
-            session=session,
-            role="assistant",
-            message=answer,
-            intent=intent,
-        )
-        return ChatbotResult(
-            answer=answer,
-            intent=intent,
-            sources=[],
-            session_id=session.id,
-            message_id=assistant_message.id,
-        )
-
-    retrieved_chunks = get_vector_store().search(cleaned_question)
-    if not retrieved_chunks:
-        assistant_message = _save_message(
-            db,
-            user=user,
-            session=session,
-            role="assistant",
-            message=NO_CONTEXT_ANSWER,
-            intent=intent,
-        )
-        return ChatbotResult(
-            answer=NO_CONTEXT_ANSWER,
-            intent=intent,
-            sources=[],
-            session_id=session.id,
-            message_id=assistant_message.id,
-        )
-
-    sources = _build_sources(retrieved_chunks)
-    context = _build_context(retrieved_chunks)
-    user_prompt = (
-        f"College knowledge context:\n{context}\n\n"
-        f"Student question:\n{cleaned_question}\n\n"
-        "Provide a grounded answer using only the context above."
-    )
-
-    try:
-        answer = generate_completion(SYSTEM_PROMPT, user_prompt)
-    except LLMServiceError:
-        raise
-
+def _respond_without_rag(
+    db: Session,
+    *,
+    user: User,
+    session: ChatSession,
+    answer: str,
+    intent: str,
+) -> ChatbotResult:
     assistant_message = _save_message(
         db,
         user=user,
@@ -254,12 +160,128 @@ def process_chat_message(db: Session, user: User, question: str, session_id: int
         role="assistant",
         message=answer,
         intent=intent,
+    )
+    return ChatbotResult(
+        answer=answer,
+        intent=intent,
+        sources=[],
+        session_id=session.id,
+        message_id=assistant_message.id,
+    )
+
+
+def process_chat_message(db: Session, user: User, question: str, session_id: int | None = None) -> ChatbotResult:
+    cleaned_question = question.strip()
+    if not cleaned_question:
+        raise ChatbotServiceError("Question cannot be empty")
+
+    session = _get_or_create_session(db, user, session_id, cleaned_question)
+    history_before = _get_recent_history(db, session)
+    _save_message(db, user=user, session=session, role="user", message=cleaned_question)
+
+    conversational = match_conversational(cleaned_question)
+    if conversational is not None:
+        log_rag_debug(
+            question=cleaned_question,
+            intent="general",
+            raw_intent="general",
+            confidence=1.0,
+            rewritten_query=cleaned_question,
+            is_broad=False,
+            top_chunks=[],
+            llm_called=False,
+        )
+        return _respond_without_rag(
+            db,
+            user=user,
+            session=session,
+            answer=conversational.response,
+            intent="general",
+        )
+
+    try:
+        intent_result = predict_intent_with_confidence(cleaned_question)
+    except IntentServiceError as exc:
+        raise ChatbotServiceError(str(exc), status_code=503) from exc
+
+    intent = str(intent_result["intent"])
+    raw_intent = str(intent_result["raw_intent"])
+    confidence = float(intent_result["confidence"])
+    response_intent = raw_intent
+    intent_hint = raw_intent if raw_intent not in {"general"} else None
+    if confidence < settings.intent_confidence_threshold:
+        intent_hint = None
+
+    processed = process_query(
+        cleaned_question,
+        history=history_before,
+        intent_hint=intent_hint,
+    )
+
+    retrieved_chunks = get_vector_store().search(
+        processed.retrieval_query,
+        expanded_queries=processed.expanded_queries,
+        intent_hint=intent_hint,
+        is_broad=processed.is_broad,
+    )
+
+    if not retrieved_chunks:
+        log_rag_debug(
+            question=cleaned_question,
+            intent=intent,
+            raw_intent=raw_intent,
+            confidence=confidence,
+            rewritten_query=processed.retrieval_query,
+            is_broad=processed.is_broad,
+            top_chunks=[],
+            llm_called=False,
+        )
+        return _respond_without_rag(
+            db,
+            user=user,
+            session=session,
+            answer=NO_CONTEXT_ANSWER,
+            intent=response_intent,
+        )
+
+    sources = _build_sources(retrieved_chunks)
+    context = _build_context(retrieved_chunks)
+    user_prompt = build_rag_user_prompt(
+        cleaned_question,
+        context,
+        conversation_context=processed.conversation_context,
+        is_broad=processed.is_broad,
+    )
+
+    try:
+        answer = generate_completion(SYSTEM_PROMPT, user_prompt)
+    except LLMServiceError:
+        raise
+
+    log_rag_debug(
+        question=cleaned_question,
+        intent=intent,
+        raw_intent=raw_intent,
+        confidence=confidence,
+        rewritten_query=processed.retrieval_query,
+        is_broad=processed.is_broad,
+        top_chunks=retrieved_chunks,
+        llm_called=True,
+    )
+
+    assistant_message = _save_message(
+        db,
+        user=user,
+        session=session,
+        role="assistant",
+        message=answer,
+        intent=response_intent,
         sources=sources,
     )
 
     return ChatbotResult(
         answer=answer,
-        intent=intent,
+        intent=response_intent,
         sources=sources,
         session_id=session.id,
         message_id=assistant_message.id,
