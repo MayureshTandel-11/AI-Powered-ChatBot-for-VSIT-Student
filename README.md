@@ -79,7 +79,9 @@ flowchart TD
 
 ```
 AI-Chatbot/
+├── docker-compose.yml
 ├── backend/
+│   ├── Dockerfile
 │   ├── app/
 │   │   ├── api/              # REST routes (auth, chat, admin, documents)
 │   │   ├── core/             # Config, security, JWT
@@ -99,6 +101,8 @@ AI-Chatbot/
 │   ├── tests/
 │   └── requirements.txt
 ├── frontend/
+│   ├── Dockerfile
+│   ├── nginx.conf            # Proxies /api → backend in Docker
 │   └── src/
 │       ├── components/       # Chat UI, admin upload, messages
 │       ├── pages/            # Login, Chat, AdminDashboard
@@ -110,14 +114,64 @@ AI-Chatbot/
 
 ## Prerequisites
 
-- Python 3.11+
-- Node.js 18+
-- npm
+- Python 3.11+ (local run) **or** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- Node.js 18+ (local frontend only)
+- npm (local frontend only)
 - OpenAI-compatible LLM API key (for live chat answers)
 
 ---
 
-## Installation
+## Run with Docker (recommended for a new laptop)
+
+Requires Docker Desktop. No local Python/Node install needed.
+
+```bash
+# From the repo root
+cp backend/.env.example backend/.env
+# Edit backend/.env — set JWT_SECRET and LLM_API_KEY at minimum
+
+docker compose up --build
+```
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://127.0.0.1:8000 |
+| API docs | http://127.0.0.1:8000/docs |
+| Health | http://127.0.0.1:8000/health |
+
+The frontend Nginx container proxies `/api` and `/health` to the backend, so the browser uses one origin.
+
+**Create admin (after containers are up):**
+
+```bash
+docker compose exec backend python scripts/create_admin.py \
+  --email admin.user@vsit.edu.in --password adminpass1
+```
+
+**Seed sample documents (optional):**
+
+```bash
+docker compose exec backend python scripts/seed_knowledge_base.py
+```
+
+**Train intent classifier (if `data/models` is empty on a fresh clone):**
+
+```bash
+docker compose exec backend python -m app.ml.train_model
+```
+
+Data under `backend/data/` is bind-mounted, so the SQLite DB, uploads, and FAISS index survive rebuilds. Hugging Face embedding weights are cached in a Docker volume.
+
+Stop:
+
+```bash
+docker compose down
+```
+
+---
+
+## Installation (local, without Docker)
 
 ### 1. Backend
 
@@ -281,7 +335,6 @@ Tests cover authentication, document processing, chunking, embeddings, FAISS ret
 - Streaming LLM responses in the chat UI
 - PDF page-level citation improvements
 - Conversation analytics dashboard
-- Docker Compose deployment
 - Fine-tuned domain embeddings on college corpus
 
 ---
